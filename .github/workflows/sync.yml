@@ -1,0 +1,29 @@
+name: Sync JSON from external URL
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # كل 30 دقيقة
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create folder
+        run: mkdir -p upload
+
+      - name: Download JSON
+        run: |
+          curl -L "https://myweby4mobile.is-best.net/upload/myweby4mobile.json" -o upload/myweby4mobile.json
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add upload/myweby4mobile.json
+          git diff --cached --quiet || git commit -m "Auto sync JSON"
+          git push
